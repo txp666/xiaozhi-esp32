@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libesp_eth.a CMakeFiles/__idf_esp_eth.dir/src/esp_eth.c.obj CMakeFiles/__idf_esp_eth.dir/src/phy/esp_eth_phy_802_3.c.obj CMakeFiles/__idf_esp_eth.dir/src/esp_eth_netif_glue.c.obj
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libesp_eth.a

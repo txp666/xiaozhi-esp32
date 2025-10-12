@@ -108,7 +108,7 @@ public:
 
     template<typename T>
     inline void set_value(const T& value) {
-        // 添加对设置的整数值进行范围检查
+    
         if constexpr (std::is_same_v<T, int>) {
             if (min_value_.has_value() && value < min_value_.value()) {
                 throw std::invalid_argument("Value is below minimum allowed: " + std::to_string(min_value_.value()));

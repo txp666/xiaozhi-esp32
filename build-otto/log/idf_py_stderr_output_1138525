@@ -1,0 +1,15 @@
+Command: make -j 10 flash
+/data/xiaozhi-esp32-OTTO/main/boards/otto-robot/oscillator.cc:13:23: warning: 'next_free_channel' defined but not used [-Wunused-variable]
+   13 | static ledc_channel_t next_free_channel = LEDC_CHANNEL_0;
+      |                       ^~~~~~~~~~~~~~~~~
+/data/xiaozhi-esp32-OTTO/main/boards/otto-robot/oscillator.cc:9:20: warning: 'TAG' defined but not used [-Wunused-variable]
+    9 | static const char* TAG = "Oscillator";
+      |                    ^~~
+/data/xiaozhi-esp32-OTTO/main/boards/otto-robot/otto_movements.cc: In member function 'void Otto::HandsUp(int, int)':
+/data/xiaozhi-esp32-OTTO/main/boards/otto-robot/otto_movements.cc:602:9: warning: unused variable 'initial' [-Wunused-variable]
+  602 |     int initial[SERVO_COUNT] = {90, 90, 90, 90, HAND_HOME_POSITION, 180 - HAND_HOME_POSITION};
+      |         ^~~~~~~
+/data/xiaozhi-esp32-OTTO/main/boards/otto-robot/otto_movements.cc: At global scope:
+/data/xiaozhi-esp32-OTTO/main/boards/otto-robot/otto_movements.cc:7:20: warning: 'TAG' defined but not used [-Wunused-variable]
+    7 | static const char* TAG = "OttoMovements";
+      |                    ^~~

@@ -28,11 +28,15 @@ private:
     LcdDisplay* display_;
     PowerManager* power_manager_;
     Button boot_button_;
+
+
+    // Khởi tạo quản lý nguồn/battery: chân detect sạc + kênh ADC đo mức pin
     void InitializePowerManager() {
         power_manager_ =
             new PowerManager(POWER_CHARGE_DETECT_PIN, POWER_ADC_UNIT, POWER_ADC_CHANNEL);
     }
 
+    // Khởi tạo bus SPI3 để điều khiển LCD (ST7789 dùng SPI)
     void InitializeSpi() {
         spi_bus_config_t buscfg = {};
         buscfg.mosi_io_num = DISPLAY_MOSI_PIN;
@@ -44,6 +48,7 @@ private:
         ESP_ERROR_CHECK(spi_bus_initialize(SPI3_HOST, &buscfg, SPI_DMA_CH_AUTO));
     }
 
+    // Khởi tạo LCD ST7789 + cấu hình xoay/mirror/đảo màu
     void InitializeLcdDisplay() {
         esp_lcd_panel_io_handle_t panel_io = nullptr;
         esp_lcd_panel_handle_t panel = nullptr;
@@ -72,11 +77,12 @@ private:
         esp_lcd_panel_invert_color(panel, DISPLAY_INVERT_COLOR);
         esp_lcd_panel_swap_xy(panel, DISPLAY_SWAP_XY);
         esp_lcd_panel_mirror(panel, DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y);
+       
 
         display_ = new OttoEmojiDisplay(
             panel_io, panel, DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y,
             DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y, DISPLAY_SWAP_XY);
-    }
+        }
 
     void InitializeButtons() {
         boot_button_.OnClick([this]() {

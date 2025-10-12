@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libesp_mm.a CMakeFiles/__idf_esp_mm.dir/esp_mmu_map.c.obj CMakeFiles/__idf_esp_mm.dir/port/esp32s3/ext_mem_layout.c.obj CMakeFiles/__idf_esp_mm.dir/esp_cache_msync.c.obj CMakeFiles/__idf_esp_mm.dir/esp_cache_utils.c.obj CMakeFiles/__idf_esp_mm.dir/heap_align_hw.c.obj
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libesp_mm.a

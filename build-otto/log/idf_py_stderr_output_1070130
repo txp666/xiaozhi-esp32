@@ -1,0 +1,1 @@
+Command: cmake -G Unix Makefiles -DPYTHON_DEPS_CHECKED=1 -DPYTHON=/home/nguyen-ngoc-hoang/.espressif/python_env/idf5.5_py3.12_env/bin/python -DESP_PLATFORM=1 -DCCACHE_ENABLE=0 /data/xiaozhi-esp32-OTTO

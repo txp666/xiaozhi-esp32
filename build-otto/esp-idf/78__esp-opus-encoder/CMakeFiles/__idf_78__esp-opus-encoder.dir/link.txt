@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc lib78__esp-opus-encoder.a "CMakeFiles/__idf_78__esp-opus-encoder.dir/opus_encoder.cc.obj" "CMakeFiles/__idf_78__esp-opus-encoder.dir/opus_decoder.cc.obj" "CMakeFiles/__idf_78__esp-opus-encoder.dir/opus_resampler.cc.obj"
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib lib78__esp-opus-encoder.a

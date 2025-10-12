@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libespressif__esp-sr.a "CMakeFiles/__idf_espressif__esp-sr.dir/src/model_path.c.obj" "CMakeFiles/__idf_espressif__esp-sr.dir/src/esp_sr_debug.c.obj" "CMakeFiles/__idf_espressif__esp-sr.dir/src/esp_mn_speech_commands.c.obj" "CMakeFiles/__idf_espressif__esp-sr.dir/src/esp_process_sdkconfig.c.obj"
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libespressif__esp-sr.a

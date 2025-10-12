@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libwaveshare__esp_lcd_touch_cst9217.a CMakeFiles/__idf_waveshare__esp_lcd_touch_cst9217.dir/esp_lcd_touch_cst9217.c.obj
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libwaveshare__esp_lcd_touch_cst9217.a

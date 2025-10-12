@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libespressif2022__image_player.a CMakeFiles/__idf_espressif2022__image_player.dir/anim_dec.c.obj CMakeFiles/__idf_espressif2022__image_player.dir/anim_player.c.obj CMakeFiles/__idf_espressif2022__image_player.dir/anim_vfs.c.obj
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libespressif2022__image_player.a

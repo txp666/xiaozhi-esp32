@@ -1,0 +1,2 @@
+source /data/xiaozhi-esp32-OTTO/build-otto/bootloader/gdbinit/symbols
+source /data/xiaozhi-esp32-OTTO/build-otto/bootloader/gdbinit/connect
