@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libesp-tls.a "CMakeFiles/__idf_esp-tls.dir/esp_tls.c.obj" "CMakeFiles/__idf_esp-tls.dir/esp-tls-crypto/esp_tls_crypto.c.obj" "CMakeFiles/__idf_esp-tls.dir/esp_tls_error_capture.c.obj" "CMakeFiles/__idf_esp-tls.dir/esp_tls_platform_port.c.obj" "CMakeFiles/__idf_esp-tls.dir/esp_tls_mbedtls.c.obj"
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libesp-tls.a

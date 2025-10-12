@@ -1,0 +1,12 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/data/xiaozhi-esp32-OTTO/build-otto/wifi_configuration.html.S
+
+/data/xiaozhi-esp32-OTTO/build-otto/wifi_configuration_done.html.S
+

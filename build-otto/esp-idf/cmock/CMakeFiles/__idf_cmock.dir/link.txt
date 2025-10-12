@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libcmock.a CMakeFiles/__idf_cmock.dir/CMock/src/cmock.c.obj
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libcmock.a

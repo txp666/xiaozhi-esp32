@@ -1,0 +1,30 @@
+Command: make -j 10 flash
+/data/xiaozhi-esp32-OTTO/main/display/display.cc:13:10: fatal error: assets/lang_config.h: No such file or directory
+   13 | #include "assets/lang_config.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[3]: *** [esp-idf/main/CMakeFiles/__idf_main.dir/build.make:363: esp-idf/main/CMakeFiles/__idf_main.dir/display/display.cc.obj] Error 1
+make[3]: *** Waiting for unfinished jobs....
+/data/xiaozhi-esp32-OTTO/main/display/oled_display.cc:2:10: fatal error: assets/lang_config.h: No such file or directory
+    2 | #include "assets/lang_config.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[3]: *** [esp-idf/main/CMakeFiles/__idf_main.dir/build.make:391: esp-idf/main/CMakeFiles/__idf_main.dir/display/oled_display.cc.obj] Error 1
+/data/xiaozhi-esp32-OTTO/main/display/emote_display.cc:24:10: fatal error: assets/lang_config.h: No such file or directory
+   24 | #include "assets/lang_config.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[3]: *** [esp-idf/main/CMakeFiles/__idf_main.dir/build.make:419: esp-idf/main/CMakeFiles/__idf_main.dir/display/emote_display.cc.obj] Error 1
+/data/xiaozhi-esp32-OTTO/main/display/lcd_display.cc:5:10: fatal error: assets/lang_config.h: No such file or directory
+    5 | #include "assets/lang_config.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[3]: *** [esp-idf/main/CMakeFiles/__idf_main.dir/build.make:377: esp-idf/main/CMakeFiles/__idf_main.dir/display/lcd_display.cc.obj] Error 1
+/data/xiaozhi-esp32-OTTO/main/display/lvgl_display/lvgl_display.cc:13:10: fatal error: assets/lang_config.h: No such file or directory
+   13 | #include "assets/lang_config.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[3]: *** [esp-idf/main/CMakeFiles/__idf_main.dir/build.make:405: esp-idf/main/CMakeFiles/__idf_main.dir/display/lvgl_display/lvgl_display.cc.obj] Error 1
+make[2]: *** [CMakeFiles/Makefile2:8387: esp-idf/main/CMakeFiles/__idf_main.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:3416: CMakeFiles/flash.dir/rule] Error 2
+make: *** [Makefile:306: flash] Error 2

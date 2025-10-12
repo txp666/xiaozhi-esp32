@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libtcp_transport.a CMakeFiles/__idf_tcp_transport.dir/transport.c.obj CMakeFiles/__idf_tcp_transport.dir/transport_ssl.c.obj CMakeFiles/__idf_tcp_transport.dir/transport_internal.c.obj CMakeFiles/__idf_tcp_transport.dir/transport_socks_proxy.c.obj CMakeFiles/__idf_tcp_transport.dir/transport_ws.c.obj
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libtcp_transport.a

@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libesp_hid.a CMakeFiles/__idf_esp_hid.dir/src/esp_hidd.c.obj CMakeFiles/__idf_esp_hid.dir/src/esp_hidh.c.obj CMakeFiles/__idf_esp_hid.dir/src/esp_hid_common.c.obj
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libesp_hid.a

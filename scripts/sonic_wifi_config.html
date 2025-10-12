@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>小智声波配网</title>
+  <title>Cài Đặt WiFi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
@@ -73,41 +73,44 @@
 </head>
 <body>
   <div class="card">
-    <h2>📶 小智声波配网</h2>
-    <label for="ssid">WiFi 名称</label>
-    <input id="ssid" type="text" value="" placeholder="请输入 WiFi 名称" />
+    <h2>📶 Cấu Hình WiFi</h2>
+    <label for="ssid">Tên WiFi</label>
+    <input id="ssid" type="text" value="" placeholder="Nhập tên WiFi của bạn" />
 
-    <label for="pwd">WiFi 密码</label>
-    <input id="pwd" type="password" value="" placeholder="请输入 WiFi 密码" />
+    <label for="pwd">Mật khẩu WiFi</label>
+    <input id="pwd" type="password" value="" placeholder="Nhập mật khẩu WiFi của bạn" />
 
     <div class="checkbox-container">
-      <label><input type="checkbox" id="loopCheck" checked /> 自动循环播放声波</label>
+      <label><input type="checkbox" id="loopCheck" checked /> Tự động phát lại sóng âm</label>
     </div>
 
-    <button onclick="generate()">🎵 生成并播放声波</button>
-    <button onclick="stopPlay()">⏹️ 停止播放</button>
+    <button onclick="generate()">🎵 Phát Sóng Âm Cấu Hình</button>
+    <button onclick="stopPlay()">⏹️ Dừng Phát</button>
     <audio id="player" controls></audio>
   </div>
 
   <script>
-    const MARK = 1800;
-    const SPACE = 1500;
-    const SAMPLE_RATE = 44100;
-    const BIT_RATE = 100;
-    const START_BYTES = [0x01, 0x02];
-    const END_BYTES = [0x03, 0x04];
+    const MARK = 1800; // Tần số cho bit 1
+    const SPACE = 1500; // Tần số cho bit 0
+    const SAMPLE_RATE = 44100; // Tốc độ mẫu (Hz)
+    const BIT_RATE = 100; // Tốc độ truyền dữ liệu (bits/giây)
+    const START_BYTES = [0x01, 0x02]; // Byte bắt đầu gói tin
+    const END_BYTES = [0x03, 0x04]; // Byte kết thúc gói tin
     let loopTimer = null;
 
+    // Hàm tính tổng kiểm tra (checksum)
     function checksum(data) {
       return data.reduce((sum, b) => (sum + b) & 0xff, 0);
     }
 
+    // Hàm chuyển byte thành mảng bit
     function toBits(byte) {
       const bits = [];
       for (let i = 7; i >= 0; i--) bits.push((byte >> i) & 1);
       return bits;
     }
 
+    // Hàm điều chế AFSK (biến đổi tần số dịch khóa)
     function afskModulate(bits) {
       const samplesPerBit = SAMPLE_RATE / BIT_RATE;
       const totalSamples = Math.floor(bits.length * samplesPerBit);
@@ -122,6 +125,7 @@
       return buffer;
     }
 
+    // Hàm chuyển dữ liệu float sang định dạng PCM 16-bit
     function floatTo16BitPCM(floatSamples) {
       const buffer = new Uint8Array(floatSamples.length * 2);
       for (let i = 0; i < floatSamples.length; i++) {
@@ -133,6 +137,7 @@
       return buffer;
     }
 
+    // Hàm xây dựng tệp WAV hoàn chỉnh
     function buildWav(pcm) {
       const wavHeader = new Uint8Array(44);
       const dataLen = pcm.length;
@@ -169,6 +174,7 @@
       return new Blob([wavHeader, pcm], { type: 'audio/wav' });
     }
 
+    // Hàm chính: Tạo và phát sóng âm
     function generate() {
       stopPlay();
       const ssid = document.getElementById('ssid').value.trim();
@@ -189,19 +195,19 @@
       audio.load();
       audio.play();
 
-      // 修改了这里：使用 'ended' 事件来实现循环播放
       if (document.getElementById('loopCheck').checked) {
         audio.onended = function() {
-          audio.currentTime = 0;  // 从头开始
-          audio.play();           // 重新播放
+          audio.currentTime = 0; // Quay lại đầu
+          audio.play(); // Phát lại
         };
       }
     }
 
+    // Hàm dừng phát sóng âm
     function stopPlay() {
       const audio = document.getElementById('player');
       audio.pause();
-      audio.onended = null;  // 清除事件监听
+      audio.onended = null; // Xóa sự kiện lắng nghe để tránh lặp lại
     }
   </script>
 </body>

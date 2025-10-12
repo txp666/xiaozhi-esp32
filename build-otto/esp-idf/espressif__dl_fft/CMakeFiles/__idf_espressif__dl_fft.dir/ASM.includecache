@@ -1,0 +1,12 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/data/xiaozhi-esp32-OTTO/managed_components/espressif__dl_fft/base/isa/esp32s3/dl_fft2r_fc32_aes3.S
+
+/data/xiaozhi-esp32-OTTO/managed_components/espressif__dl_fft/base/isa/esp32s3/dl_fft4r_fc32_aes3.S
+

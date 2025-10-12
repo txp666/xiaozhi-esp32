@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libusb.a CMakeFiles/__idf_usb.dir/hcd_dwc.c.obj CMakeFiles/__idf_usb.dir/enum.c.obj CMakeFiles/__idf_usb.dir/hub.c.obj CMakeFiles/__idf_usb.dir/usb_helpers.c.obj CMakeFiles/__idf_usb.dir/usb_host.c.obj CMakeFiles/__idf_usb.dir/usb_private.c.obj CMakeFiles/__idf_usb.dir/usbh.c.obj CMakeFiles/__idf_usb.dir/usb_phy.c.obj
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libusb.a
