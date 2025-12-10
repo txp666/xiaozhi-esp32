@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libtny-robotics__sh1106-esp-idf.a "CMakeFiles/__idf_tny-robotics__sh1106-esp-idf.dir/esp_lcd_panel_sh1106.c.obj"
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libtny-robotics__sh1106-esp-idf.a

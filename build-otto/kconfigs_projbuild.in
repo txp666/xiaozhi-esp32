@@ -1,0 +1,7 @@
+source "/home/nguyen-ngoc-hoang/esp-idf/components/bootloader/Kconfig.projbuild"
+source "/home/nguyen-ngoc-hoang/esp-idf/components/esp_app_format/Kconfig.projbuild"
+source "/home/nguyen-ngoc-hoang/esp-idf/components/esp_rom/Kconfig.projbuild"
+source "/home/nguyen-ngoc-hoang/esp-idf/components/esptool_py/Kconfig.projbuild"
+source "/home/nguyen-ngoc-hoang/esp-idf/components/partition_table/Kconfig.projbuild"
+source "/data/xiaozhi-esp32-OTTO/main/Kconfig.projbuild"
+source "/data/xiaozhi-esp32-OTTO/managed_components/espressif__esp-sr/Kconfig.projbuild"

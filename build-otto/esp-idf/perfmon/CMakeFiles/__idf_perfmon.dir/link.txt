@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libperfmon.a CMakeFiles/__idf_perfmon.dir/xtensa_perfmon_access.c.obj CMakeFiles/__idf_perfmon.dir/xtensa_perfmon_apis.c.obj CMakeFiles/__idf_perfmon.dir/xtensa_perfmon_masks.c.obj
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libperfmon.a

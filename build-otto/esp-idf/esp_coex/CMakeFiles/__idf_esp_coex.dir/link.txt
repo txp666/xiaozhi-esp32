@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libesp_coex.a CMakeFiles/__idf_esp_coex.dir/esp32s3/esp_coex_adapter.c.obj CMakeFiles/__idf_esp_coex.dir/src/coexist_debug_diagram.c.obj CMakeFiles/__idf_esp_coex.dir/src/coexist_debug.c.obj
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libesp_coex.a

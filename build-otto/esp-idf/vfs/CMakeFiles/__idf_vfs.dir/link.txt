@@ -1,0 +1,2 @@
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ar qc libvfs.a CMakeFiles/__idf_vfs.dir/vfs.c.obj CMakeFiles/__idf_vfs.dir/vfs_eventfd.c.obj CMakeFiles/__idf_vfs.dir/vfs_semihost.c.obj CMakeFiles/__idf_vfs.dir/nullfs.c.obj
+/home/nguyen-ngoc-hoang/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-ranlib libvfs.a

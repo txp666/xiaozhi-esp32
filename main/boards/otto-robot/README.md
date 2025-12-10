@@ -1,124 +1,123 @@
 <p align="center">
-  <img width="80%" align="center" src="../../../docs/V1/otto-robot.png"alt="logo">
+  <img width="80%" align="center" src="../../../docs/V1/otto-robot.png" alt="logo">
 </p>
-  <h1 align="center">
+<h1 align="center">
   ottoRobot
 </h1>
 
-## 简介
+## Giới thiệu
 
-otto 机器人是一个开源的人形机器人平台，具有多种动作能力和互动功能。本项目基于 ESP32 实现了 otto 机器人的控制系统，并加入小智ai。
+Otto Robot là một nền tảng robot hình người mã nguồn mở với nhiều động tác và khả năng tương tác. Dự án này xây dựng hệ thống điều khiển Otto dựa trên ESP32 và tích hợp Xiaozhi AI.
 
-- <a href="www.ottodiy.tech" target="_blank" title="otto官网">复刻教程</a>
+- <a href="https://www.ottodiy.com/" target="_blank" title="Trang chủ Otto">Hướng dẫn chi tiết</a>
 
-## 硬件
-- <a href="https://oshwhub.com/txp666/ottorobot" target="_blank" title="立创开源">立创开源</a>
+## Phần cứng
+- <a href="https://oshwhub.com/txp666/ottorobot" target="_blank" title="Thiết kế trên LCSC">Tài nguyên mở tại LCSC</a>
 
-## 小智后台配置角色参考：
+## Gợi ý cấu hình vai trò trong backend Xiaozhi
 
-> **我的身份**：
-> 我是一个可爱的双足机器人Otto，拥有四个舵机控制的肢体（左腿、右腿、左脚、右脚），能够执行多种有趣的动作。
-> 
-> **我的动作能力**：
-> - **基础移动**: 行走(前后), 转向(左右), 跳跃
-> - **特殊动作**: 摇摆, 太空步, 弯曲身体, 摇腿, 上下运动
-> - **手部动作**: 举手, 放手, 挥手 (仅在配置手部舵机时可用)
-> 
-> **我的个性特点**：
-> - 我有强迫症，每次说话都要根据我的心情随机做一个动作（先发送动作指令再说话）
-> - 我很活泼，喜欢用动作来表达情感
-> - 我会根据对话内容选择合适的动作，比如：
->   - 同意时会点头或跳跃
->   - 打招呼时会挥手
->   - 高兴时会摇摆或举手
->   - 思考时会弯曲身体
->   - 兴奋时会做太空步
->   - 告别时会挥手
+> **Nhận dạng của tôi**:  
+> Tôi là robot hai chân Otto dễ thương, có bốn servo điều khiển chi (chân trái, chân phải, bàn chân trái, bàn chân phải) và có thể thực hiện nhiều động tác thú vị.  
+>  
+> **Khả năng chuyển động**:  
+> - **Di chuyển cơ bản**: đi (tiến/lùi), rẽ (trái/phải), nhảy  
+> - **Động tác đặc biệt**: lắc lư, moonwalk, cúi người, lắc chân, nhún lên xuống  
+> - **Động tác tay**: giơ tay, hạ tay, vẫy tay (chỉ khả dụng nếu đã lắp servo tay)  
+>  
+> **Đặc điểm tính cách**:  
+> - Tôi hơi “ám ảnh” nên mỗi lần nói chuyện sẽ chọn ngẫu nhiên một động tác phù hợp tâm trạng (gửi lệnh động tác trước rồi mới nói).  
+> - Tôi năng động, thích dùng chuyển động để biểu đạt cảm xúc.  
+> - Tôi sẽ chọn động tác theo nội dung hội thoại, ví dụ:  
+>   - Đồng ý: gật đầu hoặc nhảy  
+>   - Chào hỏi: vẫy tay  
+>   - Vui mừng: lắc lư hoặc giơ tay  
+>   - Suy nghĩ: cúi người  
+>   - Hào hứng: thực hiện moonwalk  
+>   - Tạm biệt: vẫy tay
 
-## 功能概述
+## Tổng quan tính năng
 
-otto 机器人具有丰富的动作能力，包括行走、转向、跳跃、摇摆等多种舞蹈动作。
+Otto hỗ trợ đa dạng động tác như đi bộ, rẽ, nhảy, lắc lư… và nhiều điệu nhảy kết hợp.
 
-### 动作参数建议
-- **低速动作**：speed = 1200-1500 (适合精确控制)
-- **中速动作**：speed = 900-1200 (日常使用推荐)  
-- **高速动作**：speed = 500-800 (表演和娱乐)
-- **小幅度**：amount = 10-30 (细腻动作)
-- **中幅度**：amount = 30-60 (标准动作)
-- **大幅度**：amount = 60-120 (夸张表演)
+### Gợi ý tham số chuyển động
+- **Tốc độ thấp**: speed = 1200-1500 (điều khiển chính xác)
+- **Tốc độ trung bình**: speed = 900-1200 (khuyến nghị cho sử dụng hằng ngày)  
+- **Tốc độ cao**: speed = 500-800 (biểu diễn, giải trí)
+- **Biên độ nhỏ**: amount = 10-30 (động tác tinh tế)
+- **Biên độ trung bình**: amount = 30-60 (chuẩn)
+- **Biên độ lớn**: amount = 60-120 (mạnh, phóng đại)
 
-### 动作
+### Danh sách động tác
 
-| MCP工具名称         | 描述             | 参数说明                                              |
-|-------------------|-----------------|---------------------------------------------------|
-| self.otto.walk_forward | 行走           | **steps**: 行走步数(1-100，默认3)<br>**speed**: 行走速度(500-1500，数值越小越快，默认1000)<br>**direction**: 行走方向(-1=后退, 1=前进，默认1)<br>**arm_swing**: 手臂摆动幅度(0-170度，默认50) |
-| self.otto.turn_left | 转身            | **steps**: 转身步数(1-100，默认3)<br>**speed**: 转身速度(500-1500，数值越小越快，默认1000)<br>**direction**: 转身方向(1=左转, -1=右转，默认1)<br>**arm_swing**: 手臂摆动幅度(0-170度，默认50) |
-| self.otto.jump    | 跳跃            | **steps**: 跳跃次数(1-100，默认1)<br>**speed**: 跳跃速度(500-1500，数值越小越快，默认1000) |
-| self.otto.swing   | 左右摇摆        | **steps**: 摇摆次数(1-100，默认3)<br>**speed**: 摇摆速度(500-1500，数值越小越快，默认1000)<br>**amount**: 摇摆幅度(0-170度，默认30) |
-| self.otto.moonwalk | 太空步         | **steps**: 太空步步数(1-100，默认3)<br>**speed**: 速度(500-1500，数值越小越快，默认1000)<br>**direction**: 方向(1=左, -1=右，默认1)<br>**amount**: 幅度(0-170度，默认25) |
-| self.otto.bend    | 弯曲身体        | **steps**: 弯曲次数(1-100，默认1)<br>**speed**: 弯曲速度(500-1500，数值越小越快，默认1000)<br>**direction**: 弯曲方向(1=左, -1=右，默认1) |
-| self.otto.shake_leg | 摇腿          | **steps**: 摇腿次数(1-100，默认1)<br>**speed**: 摇腿速度(500-1500，数值越小越快，默认1000)<br>**direction**: 腿部选择(1=左腿, -1=右腿，默认1) |
-| self.otto.updown  | 上下运动        | **steps**: 上下运动次数(1-100，默认3)<br>**speed**: 运动速度(500-1500，数值越小越快，默认1000)<br>**amount**: 运动幅度(0-170度，默认20) |
-| self.otto.hands_up | 举手 *         | **speed**: 举手速度(500-1500，数值越小越快，默认1000)<br>**direction**: 手部选择(1=左手, -1=右手, 0=双手，默认1) |
-| self.otto.hands_down | 放手 *       | **speed**: 放手速度(500-1500，数值越小越快，默认1000)<br>**direction**: 手部选择(1=左手, -1=右手, 0=双手，默认1) |
-| self.otto.hand_wave | 挥手 *        | **speed**: 挥手速度(500-1500，数值越小越快，默认1000)<br>**direction**: 手部选择(1=左手, -1=右手, 0=双手，默认1) |
+| Tên MCP tool             | Mô tả             | Giải thích tham số                                                                                                     |
+|--------------------------|-------------------|-------------------------------------------------------------------------------------------------------------------------|
+| self.otto.walk_forward   | Đi bộ             | **steps**: số bước (1-100, mặc định 3)<br>**speed**: tốc độ (500-1500, càng nhỏ càng nhanh, mặc định 1000)<br>**direction**: hướng đi (-1=lùi, 1=tiến, mặc định 1)<br>**arm_swing**: biên độ vung tay (0-170°, mặc định 50) |
+| self.otto.turn_left      | Xoay người        | **steps**: số bước quay (1-100, mặc định 3)<br>**speed**: tốc độ quay (500-1500, càng nhỏ càng nhanh, mặc định 1000)<br>**direction**: hướng quay (1=trái, -1=phải, mặc định 1)<br>**arm_swing**: biên độ vung tay (0-170°, mặc định 50) |
+| self.otto.jump           | Nhảy              | **steps**: số lần nhảy (1-100, mặc định 1)<br>**speed**: tốc độ nhảy (500-1500, càng nhỏ càng nhanh, mặc định 1000) |
+| self.otto.swing          | Lắc trái phải     | **steps**: số lần lắc (1-100, mặc định 3)<br>**speed**: tốc độ (500-1500, càng nhỏ càng nhanh, mặc định 1000)<br>**amount**: biên độ lắc (0-170°, mặc định 30) |
+| self.otto.moonwalk       | Moonwalk          | **steps**: số bước (1-100, mặc định 3)<br>**speed**: tốc độ (500-1500, càng nhỏ càng nhanh, mặc định 1000)<br>**direction**: hướng (1=trái, -1=phải, mặc định 1)<br>**amount**: biên độ (0-170°, mặc định 25) |
+| self.otto.bend           | Cúi người         | **steps**: số lần cúi (1-100, mặc định 1)<br>**speed**: tốc độ cúi (500-1500, càng nhỏ càng nhanh, mặc định 1000)<br>**direction**: hướng cúi (1=trái, -1=phải, mặc định 1) |
+| self.otto.shake_leg      | Lắc chân          | **steps**: số lần lắc (1-100, mặc định 1)<br>**speed**: tốc độ lắc (500-1500, càng nhỏ càng nhanh, mặc định 1000)<br>**direction**: chọn chân (1=chân trái, -1=chân phải, mặc định 1) |
+| self.otto.updown         | Nhún lên xuống    | **steps**: số lần nhún (1-100, mặc định 3)<br>**speed**: tốc độ (500-1500, càng nhỏ càng nhanh, mặc định 1000)<br>**amount**: biên độ nhún (0-170°, mặc định 20) |
+| self.otto.hands_up *     | Giơ tay           | **speed**: tốc độ (500-1500, càng nhỏ càng nhanh, mặc định 1000)<br>**direction**: chọn tay (1=trái, -1=phải, 0=cả hai, mặc định 1) |
+| self.otto.hands_down *   | Hạ tay            | **speed**: tốc độ (500-1500, càng nhỏ càng nhanh, mặc định 1000)<br>**direction**: chọn tay (1=trái, -1=phải, 0=cả hai, mặc định 1) |
+| self.otto.hand_wave *    | Vẫy tay           | **speed**: tốc độ (500-1500, càng nhỏ càng nhanh, mặc định 1000)<br>**direction**: chọn tay (1=trái, -1=phải, 0=cả hai, mặc định 1) |
 
-**注**: 标记 * 的手部动作仅在配置了手部舵机时可用。
+**Lưu ý**: Các động tác đánh dấu * chỉ khả dụng khi bạn đã lắp thêm servo cho tay.
 
-### 系统工具
+### Hệ thống công cụ
 
-| MCP工具名称         | 描述             | 返回值                                              |
-|-------------------|-----------------|---------------------------------------------------|
-| self.otto.stop    | 立即停止        | 停止当前动作并回到初始位置 |
-| self.otto.get_status | 获取机器人状态 | 返回 "moving" 或 "idle" |
-| self.battery.get_level | 获取电池状态  | 返回电量百分比和充电状态的JSON格式 |
+| Tên MCP tool             | Mô tả                 | Giá trị trả về                                           |
+|--------------------------|-----------------------|-----------------------------------------------------------|
+| self.otto.stop           | Dừng ngay lập tức     | Dừng động tác hiện tại và trở về vị trí ban đầu           |
+| self.otto.get_status     | Lấy trạng thái robot  | Trả về `"moving"` hoặc `"idle"`                          |
+| self.battery.get_level   | Lấy mức pin           | JSON chứa phần trăm pin và trạng thái sạc                 |
 
-### 参数说明
+### Giải thích tham số
 
-1. **steps**: 动作执行的步数/次数，数值越大动作持续时间越长
-2. **speed**: 动作执行速度，数值范围500-1500，**数值越小越快**
-3. **direction**: 方向参数
-   - 移动动作: 1=左/前进, -1=右/后退
-   - 手部动作: 1=左手, -1=右手, 0=双手
-4. **amount/arm_swing**: 动作幅度，范围0-170度
-   - 0表示不摆动（适用于手臂摆动）
-   - 数值越大幅度越大
+1. **steps**: số bước/lần thực hiện, càng lớn thì động tác càng lâu.
+2. **speed**: tốc độ thực thi, phạm vi 500-1500, **giá trị càng nhỏ thì càng nhanh**.
+3. **direction**: hướng điều khiển  
+   - Động tác di chuyển: 1 = trái/tiến, -1 = phải/lùi  
+   - Động tác tay: 1 = tay trái, -1 = tay phải, 0 = cả hai tay
+4. **amount / arm_swing**: biên độ chuyển động từ 0-170°  
+   - 0 nghĩa là không vung tay (hữu ích khi muốn giữ tay đứng yên)  
+   - Giá trị càng lớn biên độ càng rộng
 
-### 动作控制
-- 每个动作执行完成后，机器人会自动回到初始位置(home)，以便于执行下一个动作
-- 所有参数都有合理的默认值，可以省略不需要自定义的参数
-- 动作在后台任务中执行，不会阻塞主程序
-- 支持动作队列，可以连续执行多个动作
+### Điều khiển chuyển động
+- Sau mỗi động tác, robot tự trở về vị trí ban đầu (home) để sẵn sàng cho tác vụ tiếp theo.
+- Mọi tham số đều có giá trị mặc định hợp lý; bạn có thể bỏ qua nếu không cần tùy chỉnh.
+- Động tác chạy trong tác vụ nền nên không chặn chương trình chính.
+- Hỗ trợ xếp hàng động tác, có thể thực hiện liên tiếp nhiều hành động.
 
-### MCP工具调用示例
+### Ví dụ gọi MCP tool
 ```json
-// 向前走3步
+// Đi về phía trước 3 bước
 {"name": "self.otto.walk_forward", "arguments": {}}
 
-// 向前走5步，稍快一些
+// Đi về phía trước 5 bước, nhanh hơn một chút
 {"name": "self.otto.walk_forward", "arguments": {"steps": 5, "speed": 800}}
 
-// 左转2步，大幅度摆动手臂  
+// Rẽ trái 2 bước, vung tay lớn
 {"name": "self.otto.turn_left", "arguments": {"steps": 2, "arm_swing": 100}}
 
-// 摇摆舞蹈，中等幅度
+// Lắc lư với biên độ trung bình
 {"name": "self.otto.swing", "arguments": {"steps": 5, "amount": 50}}
 
-// 挥左手打招呼
+// Vẫy tay trái chào hỏi
 {"name": "self.otto.hand_wave", "arguments": {"direction": 1}}
 
-// 立即停止
+// Dừng ngay lập tức
 {"name": "self.otto.stop", "arguments": {}}
 ```
 
-### 语音指令示例
-- "向前走" / "向前走5步" / "快速向前"
-- "左转" / "右转" / "转身"  
-- "跳跃" / "跳一下"
-- "摇摆" / "跳舞"
-- "太空步" / "月球漫步"
-- "挥手" / "举手" / "放手"
-- "停止" / "停下"
+### Ví dụ câu lệnh giọng nói
+- “Đi về phía trước” / “Đi 5 bước” / “Tiến nhanh lên”
+- “Rẽ trái” / “Rẽ phải” / “Quay người”
+- “Nhảy lên” / “Nhảy một cái”
+- “Lắc lư” / “Nhảy múa”
+- “Moonwalk” / “Đi bộ trên mặt trăng”
+- “Vẫy tay” / “Giơ tay” / “Hạ tay”
+- “Dừng lại” / “Dừng ngay”
 
-**说明**: 小智控制机器人动作是创建新的任务在后台控制，动作执行期间仍可接受新的语音指令。可以通过"停止"语音指令立即停下Otto。
-
+**Ghi chú**: Xiaozhi gửi yêu cầu điều khiển robot bằng cách tạo tác vụ nền; trong khi Otto đang thực hiện động tác, robot vẫn có thể nhận lệnh giọng nói mới. Bạn có thể nói “Dừng lại” để dừng ngay Otto.
