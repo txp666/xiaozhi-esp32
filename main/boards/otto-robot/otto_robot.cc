@@ -241,69 +241,7 @@ private:
     }
 
     bool InitializeCamera() {
-        if (!has_camera_ || i2c_bus_ == nullptr) {
-            return false;
-        }
-
-        try {
-            static esp_cam_ctlr_dvp_pin_config_t dvp_pin_config = {
-                .data_width = CAM_CTLR_DATA_WIDTH_8,
-                .data_io =
-                    {
-                        [0] = CAMERA_D0,
-                        [1] = CAMERA_D1,
-                        [2] = CAMERA_D2,
-                        [3] = CAMERA_D3,
-                        [4] = CAMERA_D4,
-                        [5] = CAMERA_D5,
-                        [6] = CAMERA_D6,
-                        [7] = CAMERA_D7,
-                    },
-                .vsync_io = CAMERA_VSYNC,
-                .de_io = CAMERA_HSYNC,
-                .pclk_io = CAMERA_PCLK,
-                .xclk_io = CAMERA_XCLK,
-            };
-
-            esp_video_init_sccb_config_t sccb_config = {
-                .init_sccb = false,
-                .i2c_handle = i2c_bus_,
-                .freq = 100000,
-            };
-
-            esp_video_init_dvp_config_t dvp_config = {
-                .sccb_config = sccb_config,
-                .reset_pin = CAMERA_RESET,
-                .pwdn_pin = CAMERA_PWDN,
-                .dvp_pin = dvp_pin_config,
-                .xclk_freq = CAMERA_XCLK_FREQ,
-            };
-
-            esp_video_init_config_t video_config = {
-                .dvp = &dvp_config,
-            };
-
-            camera_ = new EspVideo(video_config);
-
-            // 根据摄像头类型设置不同的翻转参数
-            switch (camera_type_) {
-                case OTTO_CAMERA_OV3660:
-                    camera_->SetVFlip(true);
-                    camera_->SetHMirror(true);
-                    ESP_LOGI(TAG, "OV3660: 设置 VFlip=true, HMirror=true");
-                    break;
-                case OTTO_CAMERA_OV2640:
-                default:
-                    camera_->SetVFlip(true);
-                    camera_->SetHMirror(false);
-                    ESP_LOGI(TAG, "OV2640: 设置 VFlip=true, HMirror=false");
-                    break;
-            }
-            return true;
-        } catch (...) {
-            camera_ = nullptr;
-            return false;
-        }
+        return false;
     }
 
     void InitializeAudioCodec() {

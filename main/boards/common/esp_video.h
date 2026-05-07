@@ -2,8 +2,8 @@
 #include "sdkconfig.h"
 
 #include <lvgl.h>
-#include <thread>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include <freertos/FreeRTOS.h>
@@ -11,7 +11,7 @@
 
 #include "camera.h"
 #include "jpg/image_to_jpeg.h"
-#include "esp_video_init.h"
+// #include "esp_video_init.h"  // removed: IDF 5.3 + esp_video component not available
 
 struct JpegChunk {
     uint8_t* data;
@@ -21,7 +21,7 @@ struct JpegChunk {
 class EspVideo : public Camera {
 private:
     struct FrameBuffer {
-        uint8_t *data = nullptr;
+        uint8_t* data = nullptr;
         size_t len = 0;
         uint16_t width = 0;
         uint16_t height = 0;
@@ -34,14 +34,17 @@ private:
 #endif  // CONFIG_XIAOZHI_ENABLE_ROTATE_CAMERA_IMAGE
     int video_fd_ = -1;
     bool streaming_on_ = false;
-    struct MmapBuffer { void *start = nullptr; size_t length = 0; };
+    struct MmapBuffer {
+        void* start = nullptr;
+        size_t length = 0;
+    };
     std::vector<MmapBuffer> mmap_buffers_;
     std::string explain_url_;
     std::string explain_token_;
     std::thread encoder_thread_;
 
 public:
-    EspVideo(const esp_video_init_config_t& config);
+    // EspVideo(const esp_video_init_config_t& config);  // removed: esp_video component unavailable
     ~EspVideo();
 
     virtual void SetExplainUrl(const std::string& url, const std::string& token);

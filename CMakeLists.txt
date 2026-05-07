@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.16)
 
 # Add this line to disable the specific warning
 add_compile_options(-Wno-missing-field-initializers)
+# Disable maybe-uninitialized warning-as-error (triggered by third-party components like freetype)
+add_compile_options(-Wno-error=maybe-uninitialized)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 # "Trim" the build. Include the minimal set of components, main, and anything it depends on.

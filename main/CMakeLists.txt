@@ -879,9 +879,16 @@ if(CONFIG_IDF_TARGET_ESP32)
 endif()
 
 # Include EspVideo if target is ESP32S3 or ESP32P4
-if(CONFIG_IDF_TARGET_ESP32S3 OR CONFIG_IDF_TARGET_ESP32P4)
+# NOTE: esp_video removed for ESP32S3 due to IDF 5.3 incompatibility
+if(CONFIG_IDF_TARGET_ESP32P4)
     list(APPEND SOURCES "boards/common/esp_video.cc"
                         "boards/common/rndis_board.cc"
+                        )
+endif()
+
+# For ESP32S3, only include rndis_board (no esp_video)
+if(CONFIG_IDF_TARGET_ESP32S3)
+    list(APPEND SOURCES "boards/common/rndis_board.cc"
                         )
 endif()
 

@@ -1,7 +1,11 @@
 #ifndef _BOARD_CONFIG_H_
 #define _BOARD_CONFIG_H_
 
+// Legacy ADC driver - suppress deprecation warning
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcpp"
 #include <driver/adc.h>
+#pragma GCC diagnostic pop
 #include <driver/gpio.h>
 
 #define OTTO_VERSION_AUTO 0
