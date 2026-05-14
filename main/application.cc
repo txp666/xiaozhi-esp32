@@ -1063,11 +1063,18 @@ bool Application::CanEnterSleepMode() {
     return true;
 }
 
+void Application::RegisterMcpBroadcastCallback(std::function<void(const std::string&)> callback) {
+    mcp_broadcast_callback_ = std::move(callback);
+}
+
 void Application::SendMcpMessage(const std::string& payload) {
     // Always schedule to run in main task for thread safety
-    Schedule([this, payload = std::move(payload)]() {
+    Schedule([this, payload](){ 
         if (protocol_) {
             protocol_->SendMcpMessage(payload);
+        }
+        if (mcp_broadcast_callback_) {
+            mcp_broadcast_callback_(payload);
         }
     });
 }
