@@ -18,7 +18,9 @@ import shutil
 import sys
 import json
 import struct
+import tempfile
 from datetime import datetime
+from pathlib import Path
 
 
 # =============================================================================
@@ -155,7 +157,63 @@ def copy_directory(src, dst):
         return False
 
 
-def process_sr_models(wakenet_model_dirs, multinet_model_dirs, build_dir, assets_dir):
+# WakeNet10 ships chip-specific slices. ESP-SR's runtime looks for wn10_data /
+# _MODEL_INFO_, so the unused p1/p2 siblings must be dropped and the selected
+# slice renamed before srmodels.bin is packed.
+WN10_PIE_VERSIONS = {
+    "esp32s3": "p1",
+    "esp32p4": "p2",
+    "esp32s31": "p2",
+}
+
+
+def copy_wakenet_model(src, dst, idf_target=None):
+    """Copy one wakenet model, applying WakeNet10 chip-specific file mapping."""
+    if not os.path.exists(src):
+        print(f"Warning: Source directory does not exist: {src}")
+        return False
+
+    model_name = os.path.basename(src)
+    if not model_name.startswith("wn10_"):
+        return copy_directory(src, dst)
+
+    pie = WN10_PIE_VERSIONS.get(idf_target)
+    if pie is None:
+        raise ValueError(
+            f"WakeNet10 model {model_name} requires an IDF target of "
+            f"{', '.join(sorted(WN10_PIE_VERSIONS))}, got {idf_target!r}"
+        )
+
+    os.makedirs(dst, exist_ok=True)
+    rename = {
+        f"wn10_data_{pie}": "wn10_data",
+        f"_MODEL_INFO_{pie}": "_MODEL_INFO_",
+    }
+    copied = False
+    for file_name in os.listdir(src):
+        source = os.path.join(src, file_name)
+        if file_name in rename:
+            destination = os.path.join(dst, rename[file_name])
+        elif file_name.endswith("_p1") or file_name.endswith("_p2"):
+            continue
+        else:
+            destination = os.path.join(dst, file_name)
+        if os.path.isdir(source):
+            shutil.copytree(source, destination)
+        else:
+            shutil.copy2(source, destination)
+        copied = True
+
+    if not copied or not os.path.exists(os.path.join(dst, "wn10_data")):
+        raise FileNotFoundError(
+            f"WakeNet10 model {model_name} has no {pie} slice for {idf_target}"
+        )
+    print(f"Copied WakeNet10 {model_name} ({pie}) -> {dst}")
+    return True
+
+
+def process_sr_models(wakenet_model_dirs, multinet_model_dirs, build_dir, assets_dir,
+                      idf_target=None):
     """Process SR models (wakenet and multinet) and generate srmodels.bin"""
     if not wakenet_model_dirs and not multinet_model_dirs:
         return None
@@ -173,7 +231,7 @@ def process_sr_models(wakenet_model_dirs, multinet_model_dirs, build_dir, assets
         for wakenet_model_dir in wakenet_model_dirs:
             wakenet_name = os.path.basename(wakenet_model_dir)
             wakenet_dst = os.path.join(sr_models_build_dir, wakenet_name)
-            if copy_directory(wakenet_model_dir, wakenet_dst):
+            if copy_wakenet_model(wakenet_model_dir, wakenet_dst, idf_target):
                 models_processed += 1
                 print(f"Added wakenet model: {wakenet_name}")
     
@@ -357,6 +415,82 @@ def compute_checksum(data):
     return checksum
 
 
+def read_assets_entries(path, name_length=32):
+    """Read the shared LVGL/Emote mmap format without changing UI resources."""
+    data = Path(path).read_bytes()
+    if name_length <= 0 or len(data) < 12:
+        raise ValueError("Invalid assets header or filename length")
+    count, checksum, length = struct.unpack_from("<III", data)
+    entry = struct.Struct(f"<{name_length}sIIHH")
+    table_size = count * entry.size
+    if length > len(data) - 12 or table_size > length:
+        raise ValueError("Truncated assets table or payload")
+    payload = data[12:12 + length]
+    if compute_checksum(payload) != checksum:
+        raise ValueError("Assets checksum mismatch")
+    files = {}
+    for offset in range(0, table_size, entry.size):
+        name, size, start, width, height = entry.unpack_from(payload, offset)
+        name = name.split(b"\0", 1)[0].decode("utf-8")
+        start += table_size
+        end = start + 2 + size
+        if not name or name in files or end > length or payload[start:start + 2] != b"ZZ":
+            raise ValueError("Invalid or duplicate assets entry")
+        files[name] = (payload[start + 2:end], width, height)
+    return files
+
+
+def pack_assets_entries(files, name_length=32):
+    """Preserve image dimensions as well as the original resource bytes."""
+    entry = struct.Struct(f"<{name_length}sIIHH")
+    table, payload = bytearray(), bytearray()
+    for name, (data, width, height) in files.items():
+        encoded = name.encode("utf-8")
+        if len(encoded) > name_length:
+            raise ValueError(f"Assets filename is too long: {name}")
+        table.extend(entry.pack(encoded, len(data), len(payload), width, height))
+        payload.extend(b"ZZ" + data)
+    payload = table + payload
+    return struct.pack("<III", len(files), compute_checksum(payload), len(payload)) + payload
+
+
+def configure_assets_models(base_assets, output, wakenet_models, multinet_models,
+                            idf_target=None, multinet_model_info=None,
+                            name_length=32, max_size=None):
+    """Replace prebuilt speech models while preserving custom/Emote UI data."""
+    files = read_assets_entries(base_assets, name_length)
+    if "index.json" not in files:
+        raise ValueError("Base assets must contain index.json")
+    index = json.loads(files["index.json"][0])
+    if not isinstance(index, dict) or index.get("version", 1) != 1:
+        raise ValueError("Unsupported base assets index")
+    previous_models = index.pop("srmodels", None)
+    if previous_models is not None:
+        if not isinstance(previous_models, str) or previous_models == "index.json":
+            raise ValueError("Invalid speech model reference in base assets")
+        files.pop(previous_models, None)
+    files.pop("srmodels.bin", None)
+    index.pop("multinet_model", None)
+
+    destination = Path(output)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="configured-models-", dir=destination.parent) as directory:
+        if wakenet_models or multinet_models:
+            model_file = process_sr_models(wakenet_models, multinet_models, directory,
+                                           directory, idf_target=idf_target)
+            if not model_file:
+                raise ValueError("Failed to pack the selected speech models")
+            files[model_file] = ((Path(directory) / model_file).read_bytes(), 0, 0)
+            index["srmodels"] = model_file
+        if multinet_model_info:
+            index["multinet_model"] = multinet_model_info
+        files["index.json"] = (json.dumps(index, ensure_ascii=False).encode("utf-8"), 0, 0)
+        packed = pack_assets_entries(files, name_length)
+        if max_size is not None and len(packed) > max_size:
+            raise ValueError(f"Configured assets size {len(packed)} exceeds partition limit {max_size}")
+        destination.write_bytes(packed)
+
+
 def sort_key(filename):
     basename, extension = os.path.splitext(filename)
     return extension, basename
@@ -449,6 +583,18 @@ def pack_assets_simple(target_path, include_path, out_file, assets_path, max_nam
 # =============================================================================
 # Configuration and main functions
 # =============================================================================
+
+def read_idf_target_from_sdkconfig(sdkconfig_path):
+    """Read CONFIG_IDF_TARGET from sdkconfig."""
+    if not os.path.exists(sdkconfig_path):
+        return None
+    with io.open(sdkconfig_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith("CONFIG_IDF_TARGET="):
+                return line.split("=", 1)[1].strip().strip('"')
+    return None
+
 
 def read_wakenet_from_sdkconfig(sdkconfig_path):
     """
@@ -741,7 +887,8 @@ def get_emoji_collection_path(default_emoji_collection, noto_fonts_path, project
 
 def build_assets_integrated(wakenet_model_paths, multinet_model_paths, text_font_path,
                             emoji_collection_path, extra_files_path, output_path,
-                            multinet_model_info=None, font_bundle_id=None):
+                            multinet_model_info=None, font_bundle_id=None, max_size=None,
+                            idf_target=None):
     """
     Build assets using integrated functions (no external dependencies)
     """
@@ -759,7 +906,10 @@ def build_assets_integrated(wakenet_model_paths, multinet_model_paths, text_font
         print("Starting to build assets...")
         
         # Process each component
-        srmodels = process_sr_models(wakenet_model_paths, multinet_model_paths, temp_build_dir, assets_dir) if (wakenet_model_paths or multinet_model_paths) else None
+        srmodels = process_sr_models(
+            wakenet_model_paths, multinet_model_paths, temp_build_dir, assets_dir,
+            idf_target=idf_target,
+        ) if (wakenet_model_paths or multinet_model_paths) else None
         text_font = process_text_font(text_font_path, assets_dir) if text_font_path else None
         emoji_collection = process_emoji_collection(emoji_collection_path, assets_dir) if emoji_collection_path else None
         extra_files = process_extra_files(extra_files_path, assets_dir) if extra_files_path else None
@@ -788,6 +938,13 @@ def build_assets_integrated(wakenet_model_paths, multinet_model_paths, text_font
             # Show size information
             total_size = os.path.getsize(output_path)
             print(f"Assets file size: {total_size / 1024:.2f}K ({total_size} bytes)")
+
+            if max_size is not None and total_size > max_size:
+                print(
+                    f"Error: assets.bin size {total_size} bytes exceeds partition limit "
+                    f"{max_size} bytes ({max_size / 1024:.2f}K)"
+                )
+                return False
             
             return True
         else:
@@ -812,6 +969,10 @@ def main():
     parser.add_argument('--esp_sr_model_path', help='Path to ESP-SR model directory')
     parser.add_argument('--noto_fonts_path', help='Path to noto-fonts component directory')
     parser.add_argument('--extra_files', help='Path to extra files directory to be included in assets')
+    parser.add_argument('--base_assets', help='Replace speech models in an existing custom/Emote assets file')
+    parser.add_argument('--name_length', type=int, default=32, help='Base assets filename field length')
+    parser.add_argument('--max_size', type=lambda v: int(v, 0), default=None,
+                        help='Fail if assets.bin exceeds this many bytes (decimal or 0x hex)')
     
     args = parser.parse_args()
     
@@ -833,6 +994,10 @@ def main():
     print(f"  emoji_collection: {args.emoji_collection}")
     print(f"  output: {args.output}")
     
+    idf_target = read_idf_target_from_sdkconfig(args.sdkconfig)
+    if idf_target:
+        print(f"  idf target: {idf_target}")
+
     # Read wake word type configuration from sdkconfig
     wake_word_config = read_wake_word_type_from_sdkconfig(args.sdkconfig)
     
@@ -847,6 +1012,8 @@ def main():
     # 1. Only package wakenet models if USE_ESP_WAKE_WORD=y or USE_AFE_WAKE_WORD=y
     if wake_word_config['use_esp_wake_word'] or wake_word_config['use_afe_wake_word']:
         wakenet_model_paths = get_wakenet_model_paths(wakenet_model_names, args.esp_sr_model_path)
+        if not wakenet_model_names or len(wakenet_model_paths) != len(wakenet_model_names):
+            parser.error("Wake-word detection requires selected, available ESP-SR WakeNet models")
     elif wakenet_model_names:
         print(f"  Note: Found wakenet models {wakenet_model_names} but wake word type is not ESP/AFE, skipping")
     
@@ -911,6 +1078,18 @@ def main():
         print(f"  custom wake word: {custom_wake_word_config['wake_word']} ({custom_wake_word_config['display']})")
         print(f"  wake word language: {language}")
         print(f"  wake word threshold: {custom_wake_word_config['threshold']}")
+
+    if args.base_assets:
+        try:
+            configure_assets_models(
+                args.base_assets, args.output, wakenet_model_paths, multinet_model_paths,
+                idf_target=idf_target, multinet_model_info=multinet_model_info,
+                name_length=args.name_length, max_size=args.max_size,
+            )
+        except (ValueError, OSError) as error:
+            parser.error(str(error))
+        print(f"Configured speech models in {args.output}")
+        return
     
     # Check if we have anything to build
     if not wakenet_model_paths and not multinet_model_paths and not text_font_path and not emoji_collection_path and not extra_files_path and not multinet_model_info:
@@ -925,7 +1104,8 @@ def main():
     # Build the assets
     success = build_assets_integrated(
         wakenet_model_paths, multinet_model_paths, text_font_path, emoji_collection_path,
-        extra_files_path, args.output, multinet_model_info, font_bundle_id)
+        extra_files_path, args.output, multinet_model_info, font_bundle_id, args.max_size,
+        idf_target=idf_target)
     
     if not success:
         sys.exit(1)

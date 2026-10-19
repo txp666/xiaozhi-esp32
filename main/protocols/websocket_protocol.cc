@@ -158,6 +158,17 @@ bool WebsocketProtocol::OpenAudioChannel() {
         last_incoming_time_ = std::chrono::steady_clock::now();
     });
 
+    // Callbacks run on the transport's receive task, which on 4G modems is the
+    // AT event task and cannot send, so the Pong is sent from the main task.
+    std::weak_ptr<WebSocket> weak_websocket = websocket_;
+    websocket_->OnPing([weak_websocket](const char* data, size_t len) {
+        Application::GetInstance().Schedule([weak_websocket, payload = std::string(data, len)]() {
+            if (auto websocket = weak_websocket.lock()) {
+                websocket->SendPong(payload.data(), payload.size());
+            }
+        });
+    });
+
     websocket_->OnDisconnected([this]() {
         ESP_LOGI(TAG, "Websocket disconnected");
         if (on_audio_channel_closed_ != nullptr) {
@@ -166,9 +177,10 @@ bool WebsocketProtocol::OpenAudioChannel() {
     });
 
     ESP_LOGI(TAG, "Connecting to websocket server: %s with version: %d", url.c_str(), version_);
-    if (!websocket_->Connect(url.c_str())) {
-        ESP_LOGE(TAG, "Failed to connect to websocket server, code=%d", websocket_->GetLastError());
-        SetError(Lang::Strings::SERVER_NOT_CONNECTED);
+    if (auto connected = websocket_->Connect(url.c_str()); !connected) {
+        ESP_LOGE(TAG, "Failed to connect to websocket server: %s",
+                 connected.error().ToString().c_str());
+        SetError(Lang::Strings::SERVER_NOT_CONNECTED, url);
         return false;
     }
 
@@ -223,7 +235,11 @@ std::string WebsocketProtocol::GetHelloMessage() {
 
 void WebsocketProtocol::ParseServerHello(const cJSON* root) {
     auto transport = cJSON_GetObjectItem(root, "transport");
-    if (transport == nullptr || strcmp(transport->valuestring, "websocket") != 0) {
+    if (!cJSON_IsString(transport)) {
+        ESP_LOGE(TAG, "Missing or non-string transport in server hello");
+        return;
+    }
+    if (strcmp(transport->valuestring, "websocket") != 0) {
         ESP_LOGE(TAG, "Unsupported transport: %s", transport->valuestring);
         return;
     }

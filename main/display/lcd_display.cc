@@ -5,6 +5,7 @@
 #include "settings.h"
 
 #include <esp_err.h>
+#include <esp_heap_caps.h>
 #include <esp_log.h>
 #include <esp_lvgl_port.h>
 #include <esp_psram.h>
@@ -124,6 +125,34 @@ SpiLcdDisplay::SpiLcdDisplay(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_h
     // lv image cache, currently only PNG is supported
     size_t psram_size_mb = esp_psram_get_size() / 1024 / 1024;
     if (psram_size_mb >= 8) {
+#if CONFIG_LV_USE_BUILTIN_MALLOC
+        // Base TLSF pool is CONFIG_LV_MEM_SIZE_KILOBYTES in PSRAM; grow it so
+        // the 2MB decoded-image cache does not exhaust a 2MB-PSRAM-safe pool.
+        // TLSF rejects any single pool larger than LV_MEM_SIZE when
+        // LV_MEM_POOL_EXPAND_SIZE is 0 (block_size_max = 1 << ceil(log2(LV_MEM_SIZE))).
+        const size_t extra_total = 2560 * 1024;
+        const size_t chunk_size = LV_MEM_SIZE;
+        size_t added = 0;
+        while (added < extra_total) {
+            size_t this_chunk = extra_total - added;
+            if (this_chunk > chunk_size) {
+                this_chunk = chunk_size;
+            }
+            void* pool = heap_caps_malloc(this_chunk, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+            if (pool == nullptr || lv_mem_add_pool(pool, this_chunk) == nullptr) {
+                if (pool != nullptr) {
+                    heap_caps_free(pool);
+                }
+                ESP_LOGE(TAG, "Failed to add %uKB LVGL PSRAM pool (added %uKB)",
+                         (unsigned)(this_chunk / 1024), (unsigned)(added / 1024));
+                break;
+            }
+            added += this_chunk;
+        }
+        if (added == extra_total) {
+            ESP_LOGI(TAG, "Added %uKB LVGL pool in PSRAM", (unsigned)(added / 1024));
+        }
+#endif
         lv_image_cache_resize(2 * 1024 * 1024, true);
         ESP_LOGI(TAG, "Use 2MB of PSRAM for image cache");
     } else if (psram_size_mb >= 2) {
@@ -141,6 +170,9 @@ SpiLcdDisplay::SpiLcdDisplay(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_h
     lvgl_port_init(&port_cfg);
 
     ESP_LOGI(TAG, "Adding LCD display");
+    // SPI LCD still needs an internal DMA bounce buffer for PSRAM sources.
+    // A full-frame transfer (~150KB) cannot allocate that bounce buffer, so
+    // keep a small DMA strip in internal SRAM and partial refresh.
     const lvgl_port_display_cfg_t display_cfg = {
         .io_handle = panel_io_,
         .panel_handle = panel_,
@@ -799,6 +831,38 @@ void LcdDisplay::SetPreviewImage(std::unique_ptr<LvglImage> image) {
     lv_obj_scroll_to_view_recursive(img_bubble, LV_ANIM_ON);
 }
 
+void LcdDisplay::RemoveChatMessage(const char* role, const char* content) {
+    DisplayLockGuard lock(this);
+    if (content_ == nullptr || role == nullptr || content == nullptr) {
+        return;
+    }
+    for (uint32_t i = 0; i < lv_obj_get_child_cnt(content_); ++i) {
+        auto container = lv_obj_get_child(content_, i);
+        auto bubble = container;
+        auto bubble_role = static_cast<const char*>(lv_obj_get_user_data(bubble));
+        if (bubble_role == nullptr && lv_obj_get_child_cnt(bubble) > 0) {
+            bubble = lv_obj_get_child(bubble, 0);
+            bubble_role = static_cast<const char*>(lv_obj_get_user_data(bubble));
+        }
+        if (bubble_role == nullptr || strcmp(bubble_role, role) != 0 ||
+            lv_obj_get_child_cnt(bubble) == 0) {
+            continue;
+        }
+        auto label = lv_obj_get_child(bubble, 0);
+        if (strcmp(lv_label_get_text(label), content) != 0) {
+            continue;
+        }
+        if (chat_message_label_ == label) {
+            chat_message_label_ = nullptr;
+        }
+        lv_obj_del(container);
+        if (lv_obj_get_child_cnt(content_) == 0 && emoji_label_ != nullptr) {
+            lv_obj_remove_flag(emoji_label_, LV_OBJ_FLAG_HIDDEN);
+        }
+        return;
+    }
+}
+
 void LcdDisplay::ClearChatMessages() {
     DisplayLockGuard lock(this);
     if (content_ == nullptr) {
@@ -1083,6 +1147,20 @@ void LcdDisplay::SetChatMessage(const char* role, const char* content) {
         lv_obj_align(bottom_bar_, LV_ALIGN_BOTTOM_MID, 0, 0);
     }
 #endif
+}
+
+void LcdDisplay::RemoveChatMessage(const char* role, const char* content) {
+    DisplayLockGuard lock(this);
+    if (chat_message_label_ == nullptr || content == nullptr ||
+        strcmp(lv_label_get_text(chat_message_label_), content) != 0) {
+        return;
+    }
+    // The classic layout has one text slot and does not distinguish message roles.
+    lv_anim_delete(chat_message_label_, nullptr);
+    lv_label_set_text(chat_message_label_, "");
+    if (bottom_bar_ != nullptr) {
+        lv_obj_add_flag(bottom_bar_, LV_OBJ_FLAG_HIDDEN);
+    }
 }
 
 void LcdDisplay::ClearChatMessages() {
